@@ -10,12 +10,12 @@ Your inputs are welcome and greatly appreciated! We want to make contributing to
 - Becoming a maintainer
 
 ## Github is preferred mode for collaboration
----------------------------------------------------------------------------------
+
 
 We use github to host code, to track issues and feature requests, as well as accept pull requests.
 
 ## All changes happen through Pull Requests
----------------------------------------------------------------------------------
+
 
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
 
@@ -26,7 +26,7 @@ Pull requests are the best way to propose changes to the codebase. We actively w
 5. Issue that pull request!
 
 ## Checks for a PR
----------------------------------------------------------------------------------
+
 
 Make sure your PR meets all the following requirements:
 
@@ -38,12 +38,12 @@ Note: You can have either a patch or minor or major update.
 Note: In case of a conflict, the maintainers will decide the final version to be assigned.
 
 ## Report bugs using Github's [issues](<https://github.com/edwin7026/py8085/issues>)
----------------------------------------------------------------------------------
+
 
 We use GitHub issues to track public bugs. Report a bug by [opening a new issue](<https://github.com/edwin7026/py8085/issues/new>). It's that easy!
 
 ## Write bug reports with detail, background, and sample code
-----------------------------------------------------------
+
 
 **Great Bug Reports** tend to have:
 
