@@ -18,29 +18,35 @@ class mnemoDecoder:
         ''' 
 
         self.mnemonic_pattern = r'''
-        ^                                                       # Beginning of string
-        ((?P<label>\D[A-Za-z0-9]+)\s*:)?                        # Handle labels
+        ^                                                           # Beginning of string
+        \s*
+        ((?P<label>\D[A-Za-z0-9]+)\s*:)?                            # Handle labels
         (
             \s*
-            (?P<func>[A-Z]{1,4})                                # Mnemonic function
-            \s+
+            (?P<func>[A-Z]{1,4})                                    # Mnemonic function
+            \s*
             (
-                (?P<reset>[0-7])|                               # RST Operations
-                (?P<psw>(PSW))|                                 # Push or pop to/from PSW
-                0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
-                (?P<opr_reg>[ABCDEHLM])|                        # Operand register
+                \s+
                 (
-                    (?P<rd>[ABCDEHLM])                          # Destination register
-                    \s*?,\s*?                                   # Commas and Optional spaces
+                    (?P<reset>[0-7])|                               # RST Operations
+                    (?P<psw>(PSW))|                                 # Push or pop to/from PSW
+                    0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
+                    (?P<opr_reg>[ABCDEHLM])|                        # Operand register
                     (
+                        (?P<rd>[ABCDEHLM])                          # Destination register
+                        \s*?,\s*?                                   # Commas and Optional spaces
+                        (
+                            (?P<rs>[ABCDEHLM])|                     # Source register 
                         (?P<rs>[ABCDEHLM])|                     # Source register 
-                        (?P<imm>[0-9abcdef]{2})                 # Immediate value
+                            (?P<rs>[ABCDEHLM])|                     # Source register 
+                            (?P<imm>[0-9abcdef]{2})                 # Immediate value
+                        )
                     )
-                )
-            )?                                                  # Arguments to func is optional
-        
+                )                                                   # Arguments to func is optional
+            )?
         )?
-        $                                               # End of string
+        \s*
+        $                                                           # End of string
         '''
         self.mnemonic_re = re.compile(self.mnemonic_pattern, re.VERBOSE)
         
@@ -59,6 +65,7 @@ class mnemoDecoder:
         instr_pattern = self.mnemonic_re
         re_search = instr_pattern.search(line)
         if re_search is not None:
+            label = re_search.group('label')
             func = re_search.group('func')
             rst = re_search.group('reset')
             psw = True if re_search.group('psw') else False
@@ -67,9 +74,10 @@ class mnemoDecoder:
             rd = re_search.group('rd')
             rs = re_search.group('rs')
             imm = re_search.group('imm')
-            instr_obj = instrObject(func, rst, psw, addr16, opr_reg, rd, rs, imm)
-            return instrObject
+            instr_obj = instrObject(None, label, func, rst, psw, addr16, opr_reg, rd, rs, imm)
+            return instr_obj
 
+# Test code
 if __name__ == '__main__':
     dec = mnemoDecoder()
-    print(dec.process('STAX'))
+    print(dec.process('ADD A, B'))
