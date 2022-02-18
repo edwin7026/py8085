@@ -23,7 +23,8 @@ class mnemoDecoder:
         (?P<func>[A-Z]{1,4})                            # Mnemonic function
         \s+
         (
-        RST\s+(?P<reset>[0-7])|                         # RST Operations            
+        (?P<reset>[0-7])|                               # RST Operations
+        (?P<psw>(PSW))|                                 # Push or pop to/from PSW
         0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
         (?P<opr_reg>[ABCDEHLM])|                        # Operand register
         ((?P<rd>[ABCDEHLM])                             # Destination register
@@ -51,6 +52,8 @@ class mnemoDecoder:
         re_search = instr_pattern.search(line)
         if re_search is not None:
             func = re_search.group('func')
+            rst = re_search.group('reset')
+            psw = re_search.group('psw')
             addr16 = re_search.group('addr16')
             opr_reg = re_search.group('opr_reg')
             rd = re_search.group('rd')
@@ -62,4 +65,4 @@ class mnemoDecoder:
 
 if __name__ == '__main__':
     dec = mnemoDecoder()
-    print(dec.process('ADD A, B'))
+    print(dec.process('stax A, B'))
