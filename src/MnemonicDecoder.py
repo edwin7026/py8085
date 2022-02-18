@@ -52,14 +52,14 @@ class mnemoDecoder:
         if re_search is not None:
             func = re_search.group('func')
             rst = re_search.group('reset')
-            psw = re_search.group('psw')
+            psw = True if re_search.group('psw') else False
             addr16 = re_search.group('addr16')
             opr_reg = re_search.group('opr_reg')
             rd = re_search.group('rd')
             rs = re_search.group('rs')
             imm = re_search.group('imm')
-            instr_obj = instrObject(func, addr16, opr_reg, rd, rs, imm)
-            return func
+            instr_obj = instrObject(func, rst, psw, addr16, opr_reg, rd, rs, imm)
+            return instrObject
 
 if __name__ == '__main__':
     dec = mnemoDecoder()
