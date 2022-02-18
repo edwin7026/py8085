@@ -17,7 +17,6 @@ class mnemoDecoder:
         code
         ''' 
 
-
         self.mnemonic_pattern = r'''
         ^                                               # Beginning of string
         (?P<func>[A-Z]{1,4})                            # Mnemonic function
