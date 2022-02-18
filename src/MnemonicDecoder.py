@@ -31,7 +31,7 @@ class mnemoDecoder:
         \s*?,\s*?                                       # Commas and Optional spaces
         (?P<rs>[ABCDEHLM])|                             # Source register 
         (?P<imm>[0-9abcdef]{2}))                        # Immediate value
-        )
+        )?                                              # Arguments to func is optional
         $                                               # End of string
         '''
         self.mnemonic_re = re.compile(self.mnemonic_pattern, re.VERBOSE)
@@ -61,7 +61,6 @@ class mnemoDecoder:
             imm = re_search.group('imm')
             instr_obj = instrObject(func, addr16, opr_reg, rd, rs, imm)
             return instr_obj
-
 
 if __name__ == '__main__':
     dec = mnemoDecoder()
