@@ -35,13 +35,45 @@ class instrObject:
         self.instr_addr = instr_addr
         self.label = label
         self.func = func
-        self.rst = int(rst)
+        self.rst = int(rst) if rst != None else None
         self.psw = psw
-        self.addr16 = int(addr16, 16)
+        self.addr16 = int(addr16, 16) if addr16 != None else None
         self.opr_reg = opr_reg
         self.rd = rd
         self.rs = rs
-        self.imm = int(imm, 16)
+        self.imm = int(imm, 16) if imm != None else None
+    
+    def extract_instr_bin(self):
+        '''
+        Convert mnemonic code to binary code
+        '''
+    
+    def __str__(self):
+        '''
+        Build mnemonic from instrObject
+        '''
+        code = ''
+        
+        if self.func:
+            code = code + self.func + ' '
+            if self.rst:
+                code += str(self.rst)
+            elif self.psw:
+                code += self.psw
+            elif self.addr16:
+                code += '0x' + str(self.addr16)
+            elif self.opr_reg:
+                code += self.opr_reg
+            elif self.rd:
+                code += self.rd + ', '
+                if self.rs:
+                    code += self.rs
+                elif self.imm:
+                    code += '0x' + str(self.imm)
+
+        return code
+
+        
 
     
 
