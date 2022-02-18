@@ -21,8 +21,7 @@ class mnemoDecoder:
         self.mnemonic_pattern = r'''
         ^                                               # Beginning of string
         (?P<func>[A-Z]{1,4})                            # Mnemonic function
-        \s+
-        (
+        (\s+
         (?P<reset>[0-7])|                               # RST Operations
         (?P<psw>(PSW))|                                 # Push or pop to/from PSW
         0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
@@ -60,8 +59,8 @@ class mnemoDecoder:
             rs = re_search.group('rs')
             imm = re_search.group('imm')
             instr_obj = instrObject(func, addr16, opr_reg, rd, rs, imm)
-            return instr_obj
+            return func
 
 if __name__ == '__main__':
     dec = mnemoDecoder()
-    print(dec.process('stax A, B'))
+    print(dec.process('STAX'))
