@@ -23,11 +23,11 @@ class mnemoDecoder:
         (?P<func>[A-Z]{1,4})                            # Mnemonic function
         \s+
         (
-        RST (?P<reset>[0-7])|                           # RST Operations            
+        RST\s+(?P<reset>[0-7])|                         # RST Operations            
         0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
         (?P<opr_reg>[A-Z])|                             # Operand register
         ((?P<rd>[A-Z])                                  # Destination register
-        ,\s?
+        \s*?,\s*?                                       # Commas and Optional spaces
         (?P<rs>[A-Z])|                                  # Source register 
         (?P<imm>[0-9abcdef]{2}))                        # Immediate value
         )
@@ -62,4 +62,4 @@ class mnemoDecoder:
 
 if __name__ == '__main__':
     dec = mnemoDecoder()
-    print(dec.extract_func('ADD A, B'))
+    print(dec.process('ADD A, B'))
