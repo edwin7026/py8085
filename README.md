@@ -7,3 +7,4 @@ An easy to use 8085 simulator for a first pass study on microprocessors. The cod
 - Build a graphical tool to visualize data flow
 
 ## Hey, would be glad to see contributions!
+Plese read CONTRIBUTIONS.md on notes on how to contribute
