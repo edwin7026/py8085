@@ -37,10 +37,11 @@ Make sure your PR meets all the following requirements:
 Note: You can have either a patch or minor or major update.
 Note: In case of a conflict, the maintainers will decide the final version to be assigned.
 
-Report bugs using Github's `issues <https://github.com/edwin7026/py8085/issues>`_
+Report bugs using Github's [issues](<https://github.com/edwin7026/py8085/issues>)
+
 ------------------------------------------------------------------------------------
 
-We use GitHub issues to track public bugs. Report a bug by `opening a new issue <https://github.com/edwin7026/py8085/issues/new>`_  it's that easy!
+We use GitHub issues to track public bugs. Report a bug by [opening a new issue](<https://github.com/edwin7026/py8085/issues/new>). It's that easy!
 
 Write bug reports with detail, background, and sample code
 ----------------------------------------------------------
