@@ -25,10 +25,10 @@ class mnemoDecoder:
         (
         RST\s+(?P<reset>[0-7])|                         # RST Operations            
         0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
-        (?P<opr_reg>[A-Z])|                             # Operand register
-        ((?P<rd>[A-Z])                                  # Destination register
+        (?P<opr_reg>[ABCDEHLM])|                        # Operand register
+        ((?P<rd>[ABCDEHLM])                             # Destination register
         \s*?,\s*?                                       # Commas and Optional spaces
-        (?P<rs>[A-Z])|                                  # Source register 
+        (?P<rs>[ABCDEHLM])|                             # Source register 
         (?P<imm>[0-9abcdef]{2}))                        # Immediate value
         )
         $                                               # End of string
