@@ -18,18 +18,28 @@ class mnemoDecoder:
         ''' 
 
         self.mnemonic_pattern = r'''
-        ^                                               # Beginning of string
-        (?P<func>[A-Z]{1,4})                            # Mnemonic function
-        (\s+
-        (?P<reset>[0-7])|                               # RST Operations
-        (?P<psw>(PSW))|                                 # Push or pop to/from PSW
-        0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
-        (?P<opr_reg>[ABCDEHLM])|                        # Operand register
-        ((?P<rd>[ABCDEHLM])                             # Destination register
-        \s*?,\s*?                                       # Commas and Optional spaces
-        (?P<rs>[ABCDEHLM])|                             # Source register 
-        (?P<imm>[0-9abcdef]{2}))                        # Immediate value
-        )?                                              # Arguments to func is optional
+        ^                                                       # Beginning of string
+        ((?P<label>\D[A-Za-z0-9]+)\s*:)?                        # Handle labels
+        (
+            \s*
+            (?P<func>[A-Z]{1,4})                                # Mnemonic function
+            \s+
+            (
+                (?P<reset>[0-7])|                               # RST Operations
+                (?P<psw>(PSW))|                                 # Push or pop to/from PSW
+                0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
+                (?P<opr_reg>[ABCDEHLM])|                        # Operand register
+                (
+                    (?P<rd>[ABCDEHLM])                          # Destination register
+                    \s*?,\s*?                                   # Commas and Optional spaces
+                    (
+                        (?P<rs>[ABCDEHLM])|                     # Source register 
+                        (?P<imm>[0-9abcdef]{2})                 # Immediate value
+                    )
+                )
+            )?                                                  # Arguments to func is optional
+        
+        )?
         $                                               # End of string
         '''
         self.mnemonic_re = re.compile(self.mnemonic_pattern, re.VERBOSE)
