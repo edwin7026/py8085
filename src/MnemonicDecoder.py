@@ -23,6 +23,7 @@ class mnemoDecoder:
         (?P<func>[A-Z]{1,4})                            # Mnemonic function
         \s+
         (
+        RST (?P<reset>[0-7])|                           # RST Operations            
         0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
         (?P<opr_reg>[A-Z])|                             # Operand register
         ((?P<rd>[A-Z])                                  # Destination register
