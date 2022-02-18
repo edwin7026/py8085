@@ -1,14 +1,13 @@
 # Name: Edwin Joy
 # email: edwin7026@gmail.com
-# This file contains the menmoDecoder class
+# This file contains the menmoParser class
 
 import re
 from InstructionObject import instrObject
 
-class mnemoDecoder:
+class mnemoParser:
     '''
-    This class and associated functions extract hex code from the mnemonic
-    given as input
+    This class parse the mnemonic given as input
     '''
 
     def __init__(self):
@@ -36,8 +35,6 @@ class mnemoDecoder:
                         (?P<rd>[ABCDEHLM])                          # Destination register
                         \s*?,\s*?                                   # Commas and Optional spaces
                         (
-                            (?P<rs>[ABCDEHLM])|                     # Source register 
-                        (?P<rs>[ABCDEHLM])|                     # Source register 
                             (?P<rs>[ABCDEHLM])|                     # Source register 
                             (?P<imm>[0-9abcdef]{2})                 # Immediate value
                         )
@@ -79,5 +76,5 @@ class mnemoDecoder:
 
 # Test code
 if __name__ == '__main__':
-    dec = mnemoDecoder()
-    print(dec.process('ADD A, B'))
+    parsed = mnemoParser()
+    print(parsed.process('ADD A, B'))
