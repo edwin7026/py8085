@@ -7,6 +7,8 @@
 # 3. Dump Intel Hex file
 
 from MnemonicParser import mnemoParser
+from log import logger
+import logging
 
 mnemonic_list = []
 
@@ -21,7 +23,6 @@ def extract_line(line):
     (None)      Maybe a comment or empty line
     (string)    A string of mnemonic
     '''
-    
     if line.strip(' \t') == '\n':                   # Empty line
         return None
     split_line = line.split('#')                    # Check for comments
@@ -41,7 +42,7 @@ def process_file(file_name):
     Input Argument:
     file_name:  (string) Path to the assembly file
     '''
-
+    
     with open(file_name, encoding='utf-8') as fp:
         for line in fp:
             mnem_str = extract_line(line)
