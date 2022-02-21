@@ -2,6 +2,7 @@
 # email: edwin7026@gmail.com
 # This file contains the parser
 
+from audioop import add
 import re
 import enum
 from InstructionObject import instrObject
@@ -206,6 +207,12 @@ class mnemoParser:
 
         (None) if the parsed mnemonic is just a label
         '''
+        # If label is given instead of addr16
+        if self.to_label:
+            addr16 = mnemoParser.label_dict[self.to_label]
+        else:
+            addr16 = self.addr16
+
         if self.mnem_type != mnemoType.label:
             instr_obj =  instrObject(self.instr_addr,
                                     self.func,
