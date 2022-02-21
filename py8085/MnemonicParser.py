@@ -1,80 +1,248 @@
 # Name: Edwin Joy
 # email: edwin7026@gmail.com
-# This file contains the menmoParser class
+# This file contains the parser
 
 import re
+import enum
 from InstructionObject import instrObject
+import constants
+
+class mnemoType(enum.Enum):
+    '''
+    Enumeration class to hold mnemonic type
+    '''
+    # For labels
+    label = 0               
+    label_addr = 1
+    label_instr = 2
+    
+    # For pure Instruction type
+    instruction = 3
+
 
 class mnemoParser:
     '''
-    This class parse the mnemonic given as input
+    This class parses the mnemonic given as input
     '''
+   
+    # Static variables
 
-    def __init__(self):
+    # Mnemonic pattern used for parsing
+    mnemonic_pattern = r'''
+        ^                                                               # Beginning of string
+        \s*
+        ((?P<label>\D\w+)\s*:)?                                         # Assign label to instruction
+        (    
+            (
+                \s*
+                (?P<func>[A-Z]{1,4})                                    # Mnemonic function
+                \s*
+                (
+                    \s+
+                    (
+                        (?P<reset>[0-7])|                               # RST Operations
+                        (?P<psw>(PSW))|                                 # Push or pop to/from PSW
+                        (?P<to_label>\D\w+)|                            # Reference label
+                        0x(?P<addr16>[0-9]{1,4})|                       # 16-bit address
+                        (?P<opr_reg>[ABCDEHLM])|                        # Operand register
+                        (
+                            (?P<rd>[ABCDEHLM])                          # Destination register
+                            \s*?,\s*?                                   # Commas and Optional spaces
+                            (
+                                (?P<rs>[ABCDEHLM])|                     # Source register 
+                                0x(?P<imm>[0-9abcdef]{2})|              # Immediate value
+                                
+                            )
+                        )
+                    )                                                   # Arguments to func is optional
+                )?
+            )|
+            (
+                \s*
+                0x(?P<label_addr>[0-9abcdef]{1,4})                      # Address assigned to the label
+            )
+        )?    
+        \s*
+        $                                                               # End of string
+        '''
+    
+    # Compile the regular expression
+    mnemonic_re = re.compile(mnemonic_pattern, re.VERBOSE)
+
+    # Label handling variables
+    label_fifo = []
+
+    # A dictionary of all mnemonic labels
+    label_dict = {}
+
+    # Handle instruction address
+    curr_addr = None
+
+    def __init__(self, line):
         '''
         Initializes and compiles the regular expression for parsing the mnemonic
         code
+        Parses and segregates all the tokens
+
+        Input argument:
+            line:           (string) A line of instruction mnemonic
         ''' 
-
-        self.mnemonic_pattern = r'''
-        ^                                                           # Beginning of string
-        \s*
-        ((?P<label>\D[A-Za-z0-9]+)\s*:)?                            # Handle labels
-        (
-            \s*
-            (?P<func>[A-Z]{1,4})                                    # Mnemonic function
-            \s*
-            (
-                \s+
-                (
-                    (?P<reset>[0-7])|                               # RST Operations
-                    (?P<psw>(PSW))|                                 # Push or pop to/from PSW
-                    0x(?P<addr16>[0-9abcdef]{1,4})|                 # 16-bit address
-                    (?P<opr_reg>[ABCDEHLM])|                        # Operand register
-                    (
-                        (?P<rd>[ABCDEHLM])                          # Destination register
-                        \s*?,\s*?                                   # Commas and Optional spaces
-                        (
-                            (?P<rs>[ABCDEHLM])|                     # Source register 
-                            (?P<imm>[0-9abcdef]{2})                 # Immediate value
-                        )
-                    )
-                )                                                   # Arguments to func is optional
-            )?
-        )?
-        \s*
-        $                                                           # End of string
-        '''
-        self.mnemonic_re = re.compile(self.mnemonic_pattern, re.VERBOSE)
         
-    def process(self, line):
-        '''
-        Parses the line of code and builds an instance of instrObject class from the parsed 
-        info
-
-        Arguments:
-            line:   (string) Line of code to be parsed
+        self.line = line
+        re_search = mnemoParser.mnemonic_re.search(self.line)
         
-        Returns:
-            (instrObject) containing the necessary properties of the line of mnemonic code
-        '''
-        
-        instr_pattern = self.mnemonic_re
-        re_search = instr_pattern.search(line)
         if re_search is not None:
-            label = re_search.group('label')
-            func = re_search.group('func')
-            rst = re_search.group('reset')
-            psw = True if re_search.group('psw') else False
-            addr16 = re_search.group('addr16')
-            opr_reg = re_search.group('opr_reg')
-            rd = re_search.group('rd')
-            rs = re_search.group('rs')
-            imm = re_search.group('imm')
-            instr_obj = instrObject(None, label, func, rst, psw, addr16, opr_reg, rd, rs, imm)
-            return instr_obj
+            # For instruction object    
+            self.func = re_search.group('func')
+            self.rst = re_search.group('reset')
+            self.psw = re_search.group('psw')
+            self.addr16 = re_search.group('addr16')
+            self.opr_reg = re_search.group('opr_reg')
+            self.rd = re_search.group('rd')
+            self.rs = re_search.group('rs')
+            self.imm = re_search.group('imm')
+            self.to_label = re_search.group('to_label')
+            
+            # Label collection
+            self.label = re_search.group('label')
+            self.label_addr = re_search.group('label_addr')
+        else:
+            # TODO Handle Exception
+            # TODO Logging
+            pass
+        
+        # Get mnemonic type
+        self.mnem_type = self.get_type()
+        
+        # Insert instruction 
+        self.instr_addr = None
+        self.get_instr_addr()
 
-# Test code
-if __name__ == '__main__':
-    parsed = mnemoParser()
-    print(parsed.process('ADD A, B'))
+        # Update labels dictionary if found
+        self.update_labels_dict()
+    
+    def get_type(self):
+        '''
+        Gives the type of mnemonic processed
+
+        Returns
+        (enum class member) generated by the enumeration
+            0:  Label
+            1:  Label with address
+            2:  Label with instruction
+            3:  Instruction
+        '''
+        if self.label:
+            if self.func:
+                return mnemoType.label_instr
+            elif self.label_addr:
+                return mnemoType.label_addr
+            else:
+                return mnemoType.label
+        elif self.func:
+            return mnemoType.instruction
+        else:
+            return None
+
+    def get_instr_addr(self):
+        '''
+        Get current instruction and also identify errors
+        '''
+
+        if self.mnem_type == mnemoType.label:
+            if self.curr_addr == None:
+                # Bro give a starting address
+                # TODO Handle exception
+                # TODO Logging
+                pass
+            else:
+                # 
+                # Do nothing
+                self.instr_addr = mnemoParser.curr_addr + 1
+        elif self.mnem_type == mnemoType.label_addr:
+            mnemoParser.curr_addr = int(self.label_addr, 16)
+            self.instr_addr = mnemoParser.curr_addr
+        elif self.mnem_type == mnemoType.label_instr or mnemoType.instruction:
+            if mnemoParser.curr_addr:
+                if mnemoParser.curr_addr != constants.END_OF_RAM:
+                    mnemoParser.curr_addr += 1
+                    self.instr_addr = mnemoParser.curr_addr
+                else:
+                    # Overflow!
+                    # TODO Handle exception
+                    # TODO Logging
+                    pass
+            else:
+                # No address mentioned
+                # TODO Handle exception
+                # TODO Logging
+                pass
+
+    def update_labels_dict(self):
+        '''
+        Update label dictionary depending on type of label
+        '''
+        mnem_type = self.get_type()
+
+        if mnem_type == mnemoType.label:
+            mnemoParser.label_fifo.append(self.label)
+        elif mnem_type == mnemoType.label_addr:
+            mnemoParser.label_dict[self.label] = self.label_addr
+        elif mnem_type == mnemoType.label_instr:
+            mnemoParser.label_dict[self.label] = self.instr_addr
+        elif mnem_type == mnemoType.instruction:
+            if any(mnemoParser.label_fifo):
+                lab = mnemoParser.label_fifo.pop()
+                mnemoParser.label_dict[lab] = self.instr_addr
+            else:
+                return None
+  
+    def get_instr_object(self):
+        '''
+        Returns the parsed line as an instruction object if the mnemonic is not a true label
+
+        Returns:
+        (instrObject) containing the necessary properties of the line of mnemonic code
+
+        (None) if the parsed mnemonic is just a label
+        '''
+        if self.mnem_type != mnemoType.label:
+            instr_obj =  instrObject(self.instr_addr,
+                                    self.func,
+                                    self.rst,
+                                    self.psw,
+                                    self.addr16,
+                                    self.opr_reg,
+                                    self.rd,
+                                    self.rs,
+                                    self.imm)
+            return instr_obj
+        else:
+            return None
+      
+    def get_mnemonic(self):
+        '''
+        Get mnemonic formatted
+
+        Returns:
+        (string) A string of formatted mnemonic 
+        '''
+
+        mnem_type = self.get_type()
+        addr = ' ' + str(hex(self.instr_addr))
+
+        if mnem_type == mnemoType.label:
+            return (self.label + ':')
+        elif mnem_type == mnemoType.label_addr:
+            return (self.label + ':\t' + '0x' + self.label_addr)
+        elif mnem_type == mnemoType.label_instr:
+            return (self.label + ':\t' + self.get_instr_object().__str__())
+        elif mnem_type == mnemoType.instruction:
+            return ('\t' + self.get_instr_object().__str__())
+
+    def __str__(self):
+        '''
+        Overloading print() function
+        Format and print out the mnemonic
+        '''
+        return self.get_mnemonic()
