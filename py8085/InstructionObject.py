@@ -2,13 +2,15 @@
 # email: edwin7026@gmail.com
 # This file has the instrObject class
 
+# For github
+# Remove labels
+
 class instrObject:
     '''
     Holds all parameters consituting an instuction
     '''
     def __init__(self,
                 instr_addr = None,
-                label = None,
                 func = None, 
                 rst = None, 
                 psw = None, 
@@ -22,10 +24,9 @@ class instrObject:
 
         Arguments:
         instr_addr: (int, hex) Address of the instruction in the memory
-        label:      (string) Mnemonic label if any
         func:       (string) The functional part of the opcode
         rst:        (int 0-7) RST type
-        psw:        (boolean) Pop/Push from/to PSW
+        psw:        (string) Pop/Push from/to PSW
         addr16:     (string) 16-bit address for the immediate addressing instructions
         opr_reg:    (string) Operand register for arithmetic instructions
         rd:         (string) Destination register
@@ -33,7 +34,6 @@ class instrObject:
         imm:        (string) Immediate value in the instruction
         '''
         self.instr_addr = instr_addr
-        self.label = label
         self.func = func
         self.rst = int(rst) if rst != None else None
         self.psw = psw
@@ -42,18 +42,12 @@ class instrObject:
         self.rd = rd
         self.rs = rs
         self.imm = int(imm, 16) if imm != None else None
-    
-    def extract_instr_bin(self):
-        '''
-        Convert mnemonic code to binary code
-        '''
-    
+     
     def __str__(self):
         '''
-        Build mnemonic from instrObject
-        '''
+        Overloading print function
+        '''      
         code = ''
-        
         if self.func:
             code = code + self.func + ' '
             if self.rst:
@@ -61,7 +55,7 @@ class instrObject:
             elif self.psw:
                 code += self.psw
             elif self.addr16:
-                code += '0x' + str(self.addr16)
+                code = code + str(hex(self.addr16))
             elif self.opr_reg:
                 code += self.opr_reg
             elif self.rd:
@@ -69,8 +63,9 @@ class instrObject:
                 if self.rs:
                     code += self.rs
                 elif self.imm:
-                    code += '0x' + str(self.imm)
-
+                    code = code + str(hex(self.imm))
+        else:
+            return None
         return code
 
         
