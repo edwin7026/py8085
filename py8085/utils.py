@@ -8,27 +8,7 @@
 
 from MnemonicParser import mnemoParser
 
-def process_file(file_name):
-    '''
-    File processing method. Handles mnemonic files for initial processing
-
-    Input Argument:
-    file_name:  (string) Path to the assembly file
-    '''
-    
-    mnemonic_list = []
-    with open(file_name, encoding='utf-8') as fp:
-        for line in fp:
-            mnem_str = extract_line(line)
-            mnemo_temp = mnemoParser(mnem_str)
-            mnemonic_list.append(mnemo_temp)
-
-        for obj in mnemonic_list:                   # For debug
-            print(obj)
-        
-        print(mnemoParser.label_dict)
-
-    print('File closed successfully')               # For debug
+mnemonic_list = []
 
 def extract_line(line):
     '''
@@ -54,14 +34,51 @@ def extract_line(line):
        return split_line[0]
 
 
-def dump_hex():
+def process_file(file_name):
+    '''
+    File processing method. Handles mnemonic files for initial processing
+
+    Input Argument:
+    file_name:  (string) Path to the assembly file
+    '''
+
+    with open(file_name, encoding='utf-8') as fp:
+        for line in fp:
+            mnem_str = extract_line(line)
+            mnemo_temp = mnemoParser(mnem_str)
+            mnemonic_list.append(mnemo_temp)
+
+def get_all_instr_obj(list = mnemonic_list):
+    '''
+    Extract instrObj objects from all mnemonic objects
+
+    Input arguments:
+    mnemonic_list:  (list) A list of all the mnemonic objects from the file
+    
+    Return
+    list:           A list of instrObj for corresponding instructions
+
+    '''
+    
+    instr_obj_list = []
+    for mnem in mnemonic_list:
+        instr_obj = mnem.get_instr_obj()
+        if instr_obj:
+            instr_obj_list.append(instr_obj)
+    
+    return instr_obj_list
+        
+def print_all_mnemonics(list = mnemonic_list):
+    for mnem in list:
+        print(mnem)
+
+
+def dump_hex(instr_obj_list):
     '''
     Dump CPU instruction file in Intel Hex format
+
+    Input arguments:
+    
+
     '''
     # TODO
-
-
-# For tests
-if __name__ == '__main__':
-    
-    process_file('../tests/test1.S')
