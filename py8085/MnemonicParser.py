@@ -3,6 +3,7 @@
 # This file contains the parser
 
 from audioop import add
+from errno import ELIBBAD
 import re
 import enum
 from InstructionObject import instrObject
@@ -20,6 +21,15 @@ class mnemoType(enum.Enum):
     # For pure Instruction type
     instruction = 3
 
+class addressingType(enum.Enum):
+    '''
+    Enumeration class to hold addressing type
+    '''
+    direct = 0
+    register = 1
+    register_indirect = 2
+    immediate8 = 3
+    immediate16 = 4
 
 class mnemoParser:
     '''
@@ -51,7 +61,7 @@ class mnemoParser:
                             \s*?,\s*?                                   # Commas and Optional spaces
                             (
                                 (?P<rs>[ABCDEHLM])|                     # Source register 
-                                0x(?P<reg_imm>[0-9a-f]{2})|             # Immediate value for register direct instructions
+                                0x(?P<reg_imm>[0-9a-f]{1,4})|           # Immediate value for register direct instructions
                             )
                         )|
                         (0x(?P<imm>[0-9a-f]{2}))                        # Immediate value
@@ -114,11 +124,12 @@ class mnemoParser:
         
         # Get mnemonic type
         self.mnem_type = self.get_type()
-        
+        self.addr_mode = self.get_addressing_mode()
+
         # Insert instruction 
         self.instr_addr = None
         self.get_instr_addr()
-
+        
         # Update labels dictionary if found
         self.update_labels_dict()
     
@@ -145,12 +156,42 @@ class mnemoParser:
         else:
             return None
 
+    def get_addressing_mode(self):
+        '''
+        Get the addressing mode of the instruction
+        '''
+        if self.mnem_type == mnemoType.label or self.mnem_type ==  mnemoType.label_addr:
+            return None
+        if self.mnem_type == mnemoType.instruction or self.mnem_type == mnemoType.label_instr:
+            if self.addr16:
+                return addressingType.direct
+            elif self.reg_imm:
+                if len(self.reg_imm) <= 2:
+                    return addressingType.immediate8
+                else:
+                    return addressingType.immediate16
+            elif self.imm:
+                if len(self.imm) <= 2:
+                    return addressingType.immediate8
+                else:
+                    return addressingType.immediate16
+            elif self.to_label:
+                return addressingType.immediate16
+            elif self.opr_reg or self.rs:
+                return addressingType.register
+            elif self.psw or self.rst:
+                return addressingType.register_indirect
+            else:
+                return None
+    
     def get_instr_addr(self):
         '''
         Get current instruction and also identify errors
         '''
         # TODO Handle immediate instructions and increment memory
         # address accordingly
+        # Remeber: check the length of the immediate value and accordingly
+        # increment
 
         if self.mnem_type == mnemoType.label:
             if self.curr_addr == None:
@@ -165,11 +206,22 @@ class mnemoParser:
         elif self.mnem_type == mnemoType.label_addr:
             mnemoParser.curr_addr = int(self.label_addr, 16)
             self.instr_addr = mnemoParser.curr_addr
-        elif self.mnem_type == mnemoType.label_instr or mnemoType.instruction:
+        elif self.mnem_type == mnemoType.label_instr or self.mnem_type == mnemoType.instruction:
             if mnemoParser.curr_addr:
                 if mnemoParser.curr_addr != constants.END_OF_RAM:
-                    mnemoParser.curr_addr += 1
                     self.instr_addr = mnemoParser.curr_addr
+                    if self.addr_mode == addressingType.direct:
+                        mnemoParser.curr_addr += 3
+                    elif self.addr_mode == addressingType.register:
+                        mnemoParser.curr_addr += 1
+                    elif self.addr_mode == addressingType.immediate16:
+                        mnemoParser.curr_addr += 3
+                    elif self.addr_mode == addressingType.immediate8:
+                        mnemoParser.curr_addr += 2
+                    elif self.addr_mode == addressingType.register_indirect:
+                        mnemoParser.curr_addr += 1
+                    else:
+                        mnemoParser.curr_addr += 1            
                 else:
                     # Overflow!
                     # TODO Handle exception
