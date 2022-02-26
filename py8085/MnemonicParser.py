@@ -44,23 +44,23 @@ class mnemoParser:
                         (?P<reset>[0-7])|                               # RST Operations
                         (?P<psw>(PSW))|                                 # Push or pop to/from PSW
                         (?P<to_label>\D\w+)|                            # Reference label
-                        0x(?P<addr16>[0-9]{1,4})|                       # 16-bit address
+                        0x(?P<addr16>[0-9a-f]{4})|                      # 16-bit address
                         (?P<opr_reg>[ABCDEHLM])|                        # Operand register
                         (
                             (?P<rd>[ABCDEHLM])                          # Destination register
                             \s*?,\s*?                                   # Commas and Optional spaces
                             (
                                 (?P<rs>[ABCDEHLM])|                     # Source register 
-                                0x(?P<imm>[0-9abcdef]{2})|              # Immediate value
-                                
+                                0x(?P<reg_imm>[0-9a-f]{2})|             # Immediate value for register direct instructions
                             )
-                        )
+                        )|
+                        (0x(?P<imm>[0-9a-f]{2}))                        # Immediate value
                     )                                                   # Arguments to func is optional
                 )?
             )|
             (
                 \s*
-                0x(?P<label_addr>[0-9abcdef]{1,4})                      # Address assigned to the label
+                0x(?P<label_addr>[0-9abcdef]{4})                        # Address assigned to the label
             )
         )?    
         \s*
@@ -69,7 +69,6 @@ class mnemoParser:
     
     # Compile the regular expression
     mnemonic_re = re.compile(mnemonic_pattern, re.VERBOSE)
-
     # Label handling variables
     label_fifo = []
 
@@ -101,6 +100,7 @@ class mnemoParser:
             self.opr_reg = re_search.group('opr_reg')
             self.rd = re_search.group('rd')
             self.rs = re_search.group('rs')
+            self.reg_imm = re_search.group('reg_imm')
             self.imm = re_search.group('imm')
             self.to_label = re_search.group('to_label')
             
@@ -149,6 +149,8 @@ class mnemoParser:
         '''
         Get current instruction and also identify errors
         '''
+        # TODO Handle immediate instructions and increment memory
+        # address accordingly
 
         if self.mnem_type == mnemoType.label:
             if self.curr_addr == None:
@@ -213,15 +215,16 @@ class mnemoParser:
         else:
             addr16 = self.addr16
 
-        if self.mnem_type != mnemoType.label:
+        if self.func is not None:
             instr_obj =  instrObject(self.instr_addr,
                                     self.func,
                                     self.rst,
                                     self.psw,
-                                    self.addr16,
+                                    addr16,
                                     self.opr_reg,
                                     self.rd,
                                     self.rs,
+                                    self.reg_imm,
                                     self.imm)
             return instr_obj
         else:
