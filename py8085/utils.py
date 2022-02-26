@@ -10,6 +10,8 @@ from MnemonicParser import mnemoParser
 from log import logger
 import logging
 
+from InstructionObject import instrObject
+
 mnemonic_list = []
 
 def extract_line(line):
@@ -27,7 +29,7 @@ def extract_line(line):
         return None
     split_line = line.split('#')                    # Check for comments
     if len(split_line) == 2:
-        if split_line[0] == '':                     # Full line comment
+        if split_line[0].strip(' \t') == '':        # Full line comment
             return None
         else:
             return split_line[0]
@@ -46,6 +48,8 @@ def process_file(file_name):
     with open(file_name, encoding='utf-8') as fp:
         for line in fp:
             mnem_str = extract_line(line)
+            if not mnem_str:
+                continue
             mnemo_temp = mnemoParser(mnem_str)
             mnemonic_list.append(mnemo_temp)
 
@@ -60,13 +64,13 @@ def get_all_instr_obj(list = mnemonic_list):
     list:           A list of instrObj for corresponding instructions
 
     '''
-    
     instr_obj_list = []
-    for mnem in mnemonic_list:
-        instr_obj = mnem.get_instr_obj()
+    for mnem in list:
+        instr_obj = mnem.get_instr_object()
         if instr_obj:
             instr_obj_list.append(instr_obj)
-    
+        else:
+            continue
     return instr_obj_list
         
 def print_all_mnemonics(list = mnemonic_list):
