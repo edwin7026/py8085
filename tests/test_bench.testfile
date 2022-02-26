@@ -1,0 +1,305 @@
+# Test bench for parser and assembler modules
+# File for unit testing
+
+ACI         : CE
+
+ADC A       : 0x8f
+ADC B       : 0x88
+ADC C       : 0x89
+ADC D       : 0x8a
+ADC E       : 0x8b
+ADC H       : 0x8c
+ADC L       : 0x8d
+ADC M       : 0x8e
+
+ADD A       : 0x87
+ADD B       : 0x80
+ADD C       : 0x81
+ADD D       : 0x82
+ADD E       : 0x83
+ADD H       : 0x84
+ADD L       : 0x85
+ADD M       : 0x86
+
+ADI         : 0xc6
+
+ANA A       : 0xa7
+ANA B       : 0xa0
+ANA C       : 0xa1
+ANA D       : 0xa2
+ANA E       : 0xa3
+ANA H       : 0xa4
+ANA L       : 0xa5
+ANA M       : 0xa6
+
+ANI         : 0xe6
+
+CALL        : 0xcd
+CC          : 0xdc
+CM          : 0xfc
+
+CMA         : 0x2f
+CMC         : 0x3f
+
+CMP A       : 0xbf
+CMP B       : 0xb8
+CMP C       : 0xb9
+CMP D       : 0xba
+CMP E       : 0xbb
+CMP H       : 0xbc
+CMP L       : 0xbd
+CMP M       : 0xbe
+
+CNC         : 0xd4
+CNZ         : 0xc4
+CP          : 0xf4
+CPE         : 0xec
+CPI         : 0xfe
+CPO         : 0xe4
+CZ          : 0xcc
+
+DAA         : 0x27
+DAD B       : 0x09
+DAD D       : 0x19
+DAD H       : 0x29
+DAD SP      : 0x39
+
+DCR A       : 0x3d
+DCR B       : 0x05
+DCR C       : 0x0d
+DCR D       : 0x15
+DCR E       : 0x1d
+DCR H       : 0x25
+DCR L       : 0x2d
+DCR M       : 0x35
+
+DCX B       : 0x0b
+DCX D       : 0x1b
+DCX H       : 0x2b
+DCX SP      : 0x3b
+
+DI          : 0xf3
+EI          : 0xfb
+HLT         : 0x76
+IN          : 0xdb
+
+INR A       : 0x3c
+INR B       : 0x04
+INR C       : 0x0c
+INR D       : 0x14
+INR E       : 0x1c
+INR H       : 0x24
+INR L       : 0x2c
+INR M       : 0x34
+
+INX B       : 0x03       
+INX D       : 0x13          
+INX H       : 0x23          
+INX SP      : 0x33
+
+JC          : 0xda
+JM          : 0xfa
+JMP         : 0xc3
+JNC         : 0xd2
+JNZ         : 0xc2
+JP          : 0xf2
+JPE         : 0xea
+JPO         : 0xe2
+JZ          : 0xca
+
+LDA         : 0x3a
+
+LDAX B      : 0x0a
+LDAX D      : 0x1a
+
+LHLD        : 0x2a
+LXI B       : 0x01
+LXI D       : 0x11
+LXI H       : 0x21
+LXI SP      : 0x31
+
+MOV A, A    : 0x7f
+MOV A, B    : 0x78
+MOV A, C    : 0x79
+MOV A, D    : 0x7a
+MOV A, E    : 0x7b
+MOV A, H    : 0x7c
+MOV A, L    : 0x7d
+MOV A, M    : 0x7e
+
+MOV B, A    : 0x47
+MOV B, B    : 0x40
+MOV B, C    : 0x41
+MOV B, D    : 0x42
+MOV B, E    : 0x43
+MOV B, H    : 0x44
+MOV B, L    : 0x45
+MOV B, M    : 0x46
+
+MOV C, A    : 0x4f
+MOV C, B    : 0x48
+MOV C, C    : 0x49
+MOV C, D    : 0x4a
+MOV C, E    : 0x4b
+MOV C, H    : 0x4c
+MOV C, L    : 0x4d
+MOV C, M    : 0x4e
+
+MOV D, A    : 0x57
+MOV D, B    : 0x50
+MOV D, C    : 0x51
+MOV D, D    : 0x52
+MOV D, E    : 0x53
+MOV D, H    : 0x54
+MOV D, L    : 0x55
+MOV D, M    : 0x56
+
+MOV E, A    : 0x5f
+MOV E, B    : 0x58
+MOV E, C    : 0x59
+MOV E, D    : 0x5a
+MOV E, E    : 0x5b
+MOV E, H    : 0x5c
+MOV E, L    : 0x5d
+MOV E, M    : 0x5e
+
+MOV H, A    : 0x67
+MOV H, B    : 0x60
+MOV H, C    : 0x61
+MOV H, D    : 0x62
+MOV H, E    : 0x63
+MOV H, H    : 0x64
+MOV H, L    : 0x65
+MOV H, M    : 0x66
+
+MOV L, A    : 0x6f
+MOV L, B    : 0x68
+MOV L, C    : 0x69
+MOV L, D    : 0x6a
+MOV L, E    : 0x6b
+MOV L, H    : 0x6c
+MOV L, L    : 0x6d
+MOV L, M    : 0x6e
+
+MOV M, A    : 0x77
+MOV M, B    : 0x70
+MOV M, C    : 0x71
+MOV M, D    : 0x72
+MOV M, E    : 0x73
+MOV M, H    : 0x74
+MOV M, L    : 0x75
+
+MVI A       : 0x3e
+MVI B       : 0x06
+MVI C       : 0x0e
+MVI D       : 0x16
+MVI E       : 0x1e
+MVI H       : 0x26
+MVI L       : 0x2e
+MVI M       : 0x36
+
+NOP         : 0x00
+
+ORA A       : 0xb7
+ORA B       : 0xb0
+ORA C       : 0xb1
+ORA D       : 0xb2
+ORA E       : 0xb3
+ORA H       : 0xb4
+ORA L       : 0xb5
+ORA M       : 0xb6
+
+ORI         : 0xf6
+
+OUT         : 0xd3
+
+PCHL        : 0xe9
+
+POP B       : 0xc1    
+POP D       : 0xd1
+POP H       : 0xe1
+POP PSW     : 0xf1
+
+PUSH B      : 0xc5    
+PUSH D      : 0xd5
+PUSH H      : 0xe5
+PUSH PSW    : 0xf5
+
+RAL         : 0x17
+RAR         : 0x1f
+
+RC          : 0xd8
+RET         : 0xc9
+
+RIM         : 0x20
+
+RLC         : 0x07
+
+RM          : 0xf8
+RNC         : 0xd0
+RNZ         : 0xc0
+RP          : 0xf0
+RPE         : 0xe8
+RPO         : 0xe0
+
+RRC         : 0x0f
+
+RST 0       : 0xc7
+RST 1       : 0xcf
+RST 2       : 0xd7
+RST 3       : 0xdf
+RST 4       : 0xe7
+RST 5       : 0xef
+RST 6       : 0xf7
+RST 7       : 0xff
+
+RZ          : 0xc8
+
+SBB B       : 0x98
+SBB C       : 0x99
+SBB D       : 0x9a
+SBB E       : 0x9b
+SBB H       : 0x9c
+SBB L       : 0x9d
+SBB M       : 0x9e
+
+SBI         : 0xde
+
+SHLD        : 0x22
+
+SIM         : 0x30
+
+SPHL        : 0xf9
+
+STA         : 0x32
+
+STAX B      : 0x02
+STAX D      : 0x12
+
+STC         : 0x37
+
+SUB A       : 0x97
+SUB B       : 0x90
+SUB C       : 0x91
+SUB D       : 0x92
+SUB E       : 0x93
+SUB H       : 0x94
+SUB L       : 0x95
+SUB M       : 0x96
+
+SUI         : 0xd6
+
+XCHG        : 0xeb
+
+XRA A       : 0xaf
+XRA B       : 0xa8
+XRA C       : 0xa9
+XRA D       : 0xaa
+XRA E       : 0xab
+XRA H       : 0xac
+XRA L       : 0xad
+XRA M       : 0xae
+
+XRI         : 0xee
+
+XTHL        : 0xe3
