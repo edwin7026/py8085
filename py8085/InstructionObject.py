@@ -70,6 +70,8 @@ class instrObject:
                     code += str(hex(self.imm))
         else:
             return 'N/A'
+        
+        return code
 
         
 
