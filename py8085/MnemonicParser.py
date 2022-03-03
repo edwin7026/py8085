@@ -2,12 +2,11 @@
 # email: edwin7026@gmail.com
 # This file contains the parser
 
-from audioop import add
-from errno import ELIBBAD
 import re
 import enum
-from InstructionObject import instrObject
-import constants
+from py8085.InstructionObject import instrObject
+from py8085 import constants
+from py8085.log import logger
 
 class mnemoType(enum.Enum):
     '''
@@ -53,18 +52,18 @@ class mnemoParser:
                     (
                         (?P<reset>[0-7])|                               # RST Operations
                         (?P<psw>(PSW))|                                 # Push or pop to/from PSW
-                        (?P<to_label>\D\w+)|                            # Reference label
                         0x(?P<addr16>[0-9a-f]{4})|                      # 16-bit address
-                        (?P<opr_reg>[ABCDEHLM])|                        # Operand register
+                        (?P<opr_reg>([ABCDEHLM]|SP))|                        # Operand register
                         (
-                            (?P<rd>[ABCDEHLM])                          # Destination register
+                            (?P<rd>([ABCDEHLM]|SP))                          # Destination register
                             \s*?,\s*?                                   # Commas and Optional spaces
                             (
-                                (?P<rs>[ABCDEHLM])|                     # Source register 
+                                (?P<rs>([ABCDEHLM]|SP))|                     # Source register 
                                 0x(?P<reg_imm>[0-9a-f]{1,4})|           # Immediate value for register direct instructions
                             )
                         )|
-                        (0x(?P<imm>[0-9a-f]{2}))                        # Immediate value
+                        (0x(?P<imm>[0-9a-f]{2}))|                        # Immediate value
+                        (?P<to_label>\D\w+)|                            # Reference label
                     )                                                   # Arguments to func is optional
                 )?
             )|
