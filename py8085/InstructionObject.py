@@ -2,9 +2,6 @@
 # email: edwin7026@gmail.com
 # This file has the instrObject class
 
-# For github
-# Remove labels
-
 class instrObject:
     '''
     Holds all parameters consituting an instuction
