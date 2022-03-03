@@ -6,15 +6,13 @@
 # 2. Store metadata to return formatted Hex file
 # 3. Dump Intel Hex file
 
-from MnemonicParser import mnemoParser
-from log import logger
-import logging
-
-from InstructionObject import instrObject
+from py8085.MnemonicParser import mnemoParser
+from py8085.log import logger
+from py8085.InstructionObject import instrObject
 
 mnemonic_list = []
 
-def extract_line(line):
+def extract_line(line: str):
     '''
     Extract relevant information from a line
 
@@ -37,7 +35,7 @@ def extract_line(line):
        return split_line[0]
 
 
-def process_file(file_name):
+def process_file(file_name: str):
     '''
     File processing method. Handles mnemonic files for initial processing
 
